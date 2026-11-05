@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNCLES GTA-SA — Tactical Location Finder | README</title>
+<title>UNCLES GTA-SA — Tactical Location Finder</title>
+<meta name="description" content="A sleek, tactical-style coordinate mapper for Grand Theft Auto: San Andreas">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23100c08'/%3E%3Cpath d='M50 10 L58 42 L90 50 L58 58 L50 90 L42 58 L10 50 L42 42 Z' fill='%23ff6a1a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#100c08;
@@ -23,15 +28,17 @@
     --text-faint:#8a745c;
     --danger:#ff6b62;
     --success:#8fdcae;
+    --radius-sm:6px;
     --radius-md:10px;
     --radius-lg:18px;
+    --shadow-md:0 8px 24px rgba(0,0,0,.35);
     --shadow-lg:0 20px 50px rgba(0,0,0,.55);
     --font-ui:'Segoe UI',system-ui,-apple-system,sans-serif;
+    --font-display:'Rajdhani','Segoe UI',sans-serif;
     --font-mono:'JetBrains Mono','Consolas',monospace;
   }
 
   *{ box-sizing:border-box; margin:0; padding:0; }
-
   html{ scroll-behavior:smooth; }
 
   body{
@@ -42,35 +49,56 @@
       radial-gradient(circle at 8% 92%, rgba(255,180,84,.06), transparent 40%),
       linear-gradient(160deg,var(--bg),var(--bg-soft));
     min-height:100vh;
-    line-height:1.65;
-    padding:0;
+    line-height:1.7;
+    font-size:16px;
   }
 
   ::-webkit-scrollbar{ width:10px; height:10px; }
   ::-webkit-scrollbar-track{ background:var(--bg-soft); }
   ::-webkit-scrollbar-thumb{ background:var(--border-strong); border-radius:5px; }
   ::-webkit-scrollbar-thumb:hover{ background:var(--accent); }
+  *{ scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent; }
+
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:4px; }
 
   .container{
-    max-width:960px;
+    max-width:920px;
     margin:0 auto;
-    padding:48px 24px 80px;
+    padding:56px 28px 96px;
   }
 
   /* ---------- Hero ---------- */
   .hero{
     text-align:center;
-    padding:40px 20px 48px;
+    padding:32px 16px 52px;
     border-bottom:1px solid var(--border);
-    margin-bottom:48px;
+    margin-bottom:56px;
+    position:relative;
+  }
+
+  .hero-mark{
+    width:64px;
+    height:64px;
+    margin:0 auto 20px;
+    color:var(--accent);
+    filter:drop-shadow(0 0 18px rgba(255,106,26,.55));
+    animation:float 4s ease-in-out infinite;
+  }
+
+  .hero-mark svg{ width:100%; height:100%; display:block; }
+
+  @keyframes float{
+    0%, 100%{ transform:translateY(0); }
+    50%{ transform:translateY(-6px); }
   }
 
   .hero h1{
-    font-size:clamp(28px, 5vw, 42px);
-    font-weight:800;
-    letter-spacing:.02em;
-    margin-bottom:12px;
-    background:linear-gradient(135deg, var(--accent), var(--gold));
+    font-family:var(--font-display);
+    font-size:clamp(30px, 5.5vw, 48px);
+    font-weight:700;
+    letter-spacing:.08em;
+    margin-bottom:14px;
+    background:linear-gradient(135deg, var(--accent) 20%, var(--gold) 100%);
     -webkit-background-clip:text;
     background-clip:text;
     -webkit-text-fill-color:transparent;
@@ -78,83 +106,95 @@
   }
 
   .hero .tagline{
-    font-size:clamp(14px, 2.4vw, 17px);
+    font-size:clamp(14px, 2.2vw, 17px);
     color:var(--text-dim);
     margin-bottom:28px;
-    max-width:640px;
+    max-width:600px;
     margin-left:auto;
     margin-right:auto;
   }
 
+  .hero .tagline strong{ color:var(--text); }
+
+  .hero em{
+    color:var(--text-faint);
+    font-size:13px;
+    font-style:normal;
+    letter-spacing:.04em;
+    font-family:var(--font-mono);
+    display:block;
+    margin-top:8px;
+  }
+
+  /* ---------- Badges ---------- */
   .badges{
     display:flex;
     flex-wrap:wrap;
-    gap:10px;
+    gap:8px;
     justify-content:center;
-    margin-bottom:24px;
+    margin-bottom:22px;
   }
 
   .badge{
     display:inline-flex;
     align-items:center;
     gap:6px;
-    padding:6px 14px;
+    padding:6px 13px;
     border-radius:999px;
-    font-size:12px;
-    font-weight:600;
+    font-size:11.5px;
+    font-weight:700;
     font-family:var(--font-mono);
-    letter-spacing:.02em;
+    letter-spacing:.04em;
     border:1px solid var(--border-strong);
     background:var(--surface-2);
     color:var(--text-dim);
+    text-transform:uppercase;
   }
 
   .badge.accent{ color:var(--accent); border-color:var(--accent-soft-strong); background:var(--accent-soft); }
   .badge.gold{ color:var(--gold); border-color:rgba(255,180,84,.3); background:rgba(255,180,84,.1); }
 
-  .hero em{
-    color:var(--text-faint);
-    font-size:13px;
-    font-style:normal;
-    letter-spacing:.02em;
-  }
-
   /* ---------- Sections ---------- */
-  section{ margin-bottom:56px; }
+  section{ margin-bottom:64px; }
 
   h2{
-    font-size:clamp(22px, 3.4vw, 28px);
+    font-family:var(--font-display);
+    font-size:clamp(22px, 3.4vw, 30px);
     font-weight:700;
-    margin-bottom:20px;
+    letter-spacing:.03em;
+    margin-bottom:22px;
     color:var(--text);
     display:flex;
     align-items:center;
-    gap:12px;
-    padding-bottom:12px;
+    gap:14px;
+    padding-bottom:14px;
     border-bottom:1px solid var(--border);
-    letter-spacing:.01em;
   }
 
   h2::before{
     content:'';
     display:inline-block;
     width:4px;
-    height:24px;
+    height:26px;
     background:linear-gradient(180deg, var(--accent), var(--gold));
     border-radius:2px;
+    flex-shrink:0;
   }
 
   h3{
-    font-size:clamp(17px, 2.4vw, 20px);
+    font-family:var(--font-display);
+    font-size:clamp(16px, 2.2vw, 19px);
     font-weight:700;
+    letter-spacing:.03em;
     color:var(--gold);
-    margin:24px 0 12px;
+    margin:28px 0 14px;
+    text-transform:uppercase;
   }
 
   p{
     color:var(--text-dim);
-    margin-bottom:14px;
-    font-size:15px;
+    margin-bottom:16px;
+    font-size:15.5px;
   }
 
   strong{ color:var(--text); font-weight:700; }
@@ -166,7 +206,6 @@
     border-bottom:1px dotted var(--accent);
     transition:color .15s ease, border-color .15s ease;
   }
-
   a:hover{ color:var(--accent-hover); border-color:var(--accent-hover); }
 
   code{
@@ -185,34 +224,34 @@
     color:var(--text-dim);
     padding-left:0;
     list-style:none;
-    margin-bottom:16px;
+    margin-bottom:18px;
   }
 
   ul li, ol li{
     position:relative;
-    padding-left:26px;
-    margin-bottom:9px;
-    font-size:15px;
+    padding-left:28px;
+    margin-bottom:10px;
+    font-size:15.5px;
   }
 
   ul li::before{
     content:'▸';
     position:absolute;
-    left:0;
+    left:4px;
     top:0;
     color:var(--accent);
     font-weight:700;
   }
 
   ol{ counter-reset:item; }
-  ol li{ padding-left:32px; counter-increment:item; }
+  ol li{ padding-left:36px; counter-increment:item; }
   ol li::before{
     content:counter(item);
     position:absolute;
     left:0;
-    top:2px;
-    width:22px;
-    height:22px;
+    top:3px;
+    width:24px;
+    height:24px;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -230,14 +269,14 @@
     overflow-x:auto;
     border-radius:var(--radius-md);
     border:1px solid var(--border-strong);
-    margin-bottom:20px;
+    margin-bottom:22px;
     box-shadow:var(--shadow-lg);
   }
 
   table{
     width:100%;
     border-collapse:collapse;
-    font-size:14px;
+    font-size:14.5px;
     min-width:520px;
   }
 
@@ -246,38 +285,39 @@
   }
 
   thead th{
-    padding:12px 16px;
+    padding:13px 18px;
     text-align:left;
+    font-family:var(--font-mono);
     font-weight:700;
-    font-size:13px;
-    letter-spacing:.03em;
+    font-size:12px;
+    letter-spacing:.06em;
     color:var(--gold);
     border-bottom:1px solid var(--border-strong);
-    font-family:var(--font-mono);
     text-transform:uppercase;
   }
 
   tbody td{
-    padding:11px 16px;
+    padding:12px 18px;
     border-bottom:1px solid var(--border);
     color:var(--text-dim);
     vertical-align:top;
   }
 
   tbody tr:last-child td{ border-bottom:none; }
-  tbody tr:hover td{ background:rgba(255,106,26,.04); color:var(--text); }
+  tbody tr:hover td{ background:rgba(255,106,26,.05); color:var(--text); }
+  tbody td strong{ color:var(--text); }
 
   /* ---------- Code blocks ---------- */
   pre{
     background:var(--surface);
     border:1px solid var(--border-strong);
     border-radius:var(--radius-md);
-    padding:18px 20px;
+    padding:20px 22px;
     overflow-x:auto;
-    margin-bottom:20px;
+    margin-bottom:22px;
     font-family:var(--font-mono);
     font-size:13px;
-    line-height:1.7;
+    line-height:1.75;
     color:var(--text);
     box-shadow:var(--shadow-lg);
     position:relative;
@@ -292,14 +332,14 @@
     white-space:pre;
   }
 
-  pre::before{
+  pre[data-lang]::before{
     content:attr(data-lang);
     position:absolute;
-    top:8px;
-    right:14px;
+    top:9px;
+    right:16px;
     font-size:10px;
     color:var(--text-faint);
-    letter-spacing:.08em;
+    letter-spacing:.1em;
     text-transform:uppercase;
     font-weight:700;
   }
@@ -309,10 +349,11 @@
     background:var(--accent-soft);
     border-left:3px solid var(--accent);
     border-radius:0 var(--radius-md) var(--radius-md) 0;
-    padding:14px 18px;
-    margin-bottom:20px;
-    font-size:14px;
+    padding:16px 20px;
+    margin-bottom:22px;
+    font-size:14.5px;
     color:var(--text);
+    line-height:1.8;
   }
 
   .callout.gold{
@@ -328,8 +369,8 @@
     background:linear-gradient(180deg, var(--surface-2), var(--surface));
     border:1px solid var(--border-strong);
     border-radius:var(--radius-lg);
-    padding:24px;
-    margin-bottom:20px;
+    padding:26px;
+    margin-bottom:22px;
     overflow-x:auto;
     box-shadow:var(--shadow-lg);
   }
@@ -349,9 +390,9 @@
   /* ---------- Color swatches ---------- */
   .swatches{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));
     gap:12px;
-    margin-bottom:20px;
+    margin-bottom:22px;
   }
 
   .swatch{
@@ -361,12 +402,15 @@
     background:var(--surface-2);
     border:1px solid var(--border);
     border-radius:var(--radius-md);
-    padding:10px 14px;
+    padding:11px 14px;
+    transition:border-color .2s ease, transform .2s ease;
   }
 
+  .swatch:hover{ border-color:var(--accent); transform:translateY(-2px); }
+
   .swatch-box{
-    width:34px;
-    height:34px;
+    width:36px;
+    height:36px;
     border-radius:8px;
     flex-shrink:0;
     border:1px solid var(--border-strong);
@@ -380,31 +424,35 @@
   /* ---------- Footer ---------- */
   footer{
     text-align:center;
-    padding-top:40px;
+    padding-top:48px;
     border-top:1px solid var(--border);
-    margin-top:64px;
+    margin-top:80px;
     color:var(--text-faint);
     font-size:14px;
   }
 
   footer .footer-brand{
-    font-size:18px;
-    font-weight:800;
+    font-family:var(--font-display);
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:.08em;
     color:var(--accent);
-    letter-spacing:.03em;
-    margin-bottom:8px;
+    margin-bottom:10px;
   }
 
-  footer p{ font-size:13px; margin-bottom:8px; }
-  footer .heart{ color:var(--accent); }
+  footer p{ font-size:13.5px; margin-bottom:10px; }
+  footer .heart{ color:var(--accent); display:inline-block; }
 
   /* ---------- Responsive ---------- */
   @media (max-width:640px){
-    .container{ padding:24px 16px 60px; }
-    .hero{ padding:24px 8px 36px; margin-bottom:36px; }
-    section{ margin-bottom:40px; }
-    h2{ font-size:20px; }
-    p, ul li, ol li{ font-size:14px; }
+    .container{ padding:28px 18px 64px; }
+    .hero{ padding:16px 8px 40px; margin-bottom:40px; }
+    section{ margin-bottom:44px; }
+    h2{ font-size:22px; }
+    p, ul li, ol li{ font-size:14.5px; }
+    pre{ padding:16px 18px; font-size:12px; }
+    .preview{ padding:16px; }
+    .preview pre{ font-size:10px; }
   }
 
   @media (prefers-reduced-motion:reduce){
@@ -419,7 +467,13 @@
 
   <!-- ================= HERO ================= -->
   <header class="hero">
-    <h1>🗺️ UNCLES GTA-SA</h1>
+    <div class="hero-mark">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2L14 10L22 12L14 14L12 22L10 14L2 12L10 10Z" fill="currentColor"/>
+      </svg>
+    </div>
+
+    <h1>UNCLES GTA-SA</h1>
     <p class="tagline">
       A sleek, tactical-style coordinate mapper for <strong>Grand Theft Auto: San Andreas</strong>
     </p>
@@ -570,34 +624,13 @@ start index.html     # Windows</code></pre>
     <h2>🎨 Design System</h2>
 
     <div class="swatches">
-      <div class="swatch">
-        <span class="swatch-box" style="background:#100c08;"></span>
-        <div class="swatch-info"><span class="swatch-name">--bg</span><span class="swatch-value">#100c08</span></div>
-      </div>
-      <div class="swatch">
-        <span class="swatch-box" style="background:#1c140c;"></span>
-        <div class="swatch-info"><span class="swatch-name">--surface</span><span class="swatch-value">#1c140c</span></div>
-      </div>
-      <div class="swatch">
-        <span class="swatch-box" style="background:#ff6a1a;"></span>
-        <div class="swatch-info"><span class="swatch-name">--accent</span><span class="swatch-value">#ff6a1a</span></div>
-      </div>
-      <div class="swatch">
-        <span class="swatch-box" style="background:#ffb454;"></span>
-        <div class="swatch-info"><span class="swatch-name">--gold</span><span class="swatch-value">#ffb454</span></div>
-      </div>
-      <div class="swatch">
-        <span class="swatch-box" style="background:#f5ead9;"></span>
-        <div class="swatch-info"><span class="swatch-name">--text</span><span class="swatch-value">#f5ead9</span></div>
-      </div>
-      <div class="swatch">
-        <span class="swatch-box" style="background:#ff6b62;"></span>
-        <div class="swatch-info"><span class="swatch-name">--danger</span><span class="swatch-value">#ff6b62</span></div>
-      </div>
-      <div class="swatch">
-        <span class="swatch-box" style="background:#8fdcae;"></span>
-        <div class="swatch-info"><span class="swatch-name">--success</span><span class="swatch-value">#8fdcae</span></div>
-      </div>
+      <div class="swatch"><span class="swatch-box" style="background:#100c08;"></span><div class="swatch-info"><span class="swatch-name">--bg</span><span class="swatch-value">#100c08</span></div></div>
+      <div class="swatch"><span class="swatch-box" style="background:#1c140c;"></span><div class="swatch-info"><span class="swatch-name">--surface</span><span class="swatch-value">#1c140c</span></div></div>
+      <div class="swatch"><span class="swatch-box" style="background:#ff6a1a;"></span><div class="swatch-info"><span class="swatch-name">--accent</span><span class="swatch-value">#ff6a1a</span></div></div>
+      <div class="swatch"><span class="swatch-box" style="background:#ffb454;"></span><div class="swatch-info"><span class="swatch-name">--gold</span><span class="swatch-value">#ffb454</span></div></div>
+      <div class="swatch"><span class="swatch-box" style="background:#f5ead9;"></span><div class="swatch-info"><span class="swatch-name">--text</span><span class="swatch-value">#f5ead9</span></div></div>
+      <div class="swatch"><span class="swatch-box" style="background:#ff6b62;"></span><div class="swatch-info"><span class="swatch-name">--danger</span><span class="swatch-value">#ff6b62</span></div></div>
+      <div class="swatch"><span class="swatch-box" style="background:#8fdcae;"></span><div class="swatch-info"><span class="swatch-name">--success</span><span class="swatch-value">#8fdcae</span></div></div>
     </div>
 
     <h3>Typography</h3>
